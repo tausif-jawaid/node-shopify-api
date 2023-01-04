@@ -15,7 +15,7 @@ app.use((req,res,next) => {
     console.log(req.path,req.method)
     next()
 })
-
+// here is different routes
 app.use('/api/shopify/metafields',metafieldsRoutes);
 app.use('/api/shopify/products',productsRouts)
 
