@@ -42,9 +42,15 @@ const readCsv = (filePath) => {
 const createProducts = async (req, res) => {
   const data = readCsv(filePath);
   const logs = {}
-  let count = 0
-  // console.log(data)
+  let count = 1;
+  let fail = 0;
+  let success = 0;
+  var time = 1000;
+  console.log(data.length)
+  //console.log(data)
+
   data.map(item => {
+
     let data = {
       product: {
         title: item.title,
@@ -52,28 +58,46 @@ const createProducts = async (req, res) => {
         vendor: item.vendor,
         handle: item.handle,
         product_type: item.product_type,
+        variants: [
+          {
+            sku: item.sku,
+            title: item.sku_title,
+          }
+        ]
       }
     }
-    axios({
-      url: "https://apna-star-store.myshopify.com/admin/api/2023-01/products.json",
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Shopify-Access-Token": token,
-        "Accept-Encoding": "gzip,deflate,compress"
-      },
-      data: JSON.stringify(data)
-    }).then(response => {
-      count++;
-      logs['dataResponse' + count] = response.data
-    }).catch((err) => {
-      logs['errorAt' + count] = err.data
-    });
-  })
-  //console.log((logs));
-  res.status(200).json({ message: 'Data Succesfully Imported' });
 
+    // console.log(data);
+    setTimeout(() => {
+      axios({
+        url: "https://apna-star-store.myshopify.com/admin/api/2023-01/products.json",
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Access-Token": token,
+          "Accept-Encoding": "gzip,deflate,compress"
+        },
+        data: JSON.stringify(data)
+      }).then(response => {
+        success++;
+        console.log(`count in success ${success}`)
+        logs['dataResponse' + count] = response.data
+      }).catch((err) => {
+        fail++;
+        console.log(`count in failure ${fail}, ${err}`)
+        logs['errorAt' + count] = err.data
+      });
+
+    }, time * count);
+    count++;
+  })
+
+  //console.log((logs));
+  //res.status(200).json(data);
+  res.status(200).json({ message: 'Data Succesfully Imported' });
 };
+
+// For add Single Product in shopify API
 
 // const createProducts = async (req, res) => {
 //   const data = {
