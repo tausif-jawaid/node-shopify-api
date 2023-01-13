@@ -1,8 +1,7 @@
 const fs = require("fs");
 const axios = require("axios");
-const csv = require("csv-parser");
 require('dotenv').config();
-const reader = require('xlsx')
+const { readCsv } = require("../helpers/readXlxs"); 
 filePath = './product_info.xlsx';
 
 const token = process.env.ACCESS_TOKEN;
@@ -23,20 +22,6 @@ const getProduct = async (req, res) => {
     res.status(500).json({ message: err });
   });
 };
-
-const readCsv = (filePath) => {
-  const file = reader.readFile(filePath)
-  let data = []
-  const sheets = file.SheetNames
-  for (let i = 0; i < sheets.length; i++) {
-    const temp = reader.utils.sheet_to_json(
-      file.Sheets[file.SheetNames[i]])
-    temp.forEach((res) => {
-      data.push(res)
-    })
-  }
-  return data;
-}
 
 // create new metafields for specific product
 const createProducts = async (req, res) => {
