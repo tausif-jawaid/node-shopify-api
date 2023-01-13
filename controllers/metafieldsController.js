@@ -1,7 +1,6 @@
 const fs = require("fs");
 const axios = require("axios");
-const csv = require("csv-parser");
-const reader = require('xlsx')
+const {readCsv} = require('../helpers/readXlxs')
 require('dotenv').config();
 
 const token = process.env.ACCESS_TOKEN;
@@ -41,20 +40,6 @@ const countMetafields = async (req, res) => {
     });
 };
 
-const readCsv = (filePath) => {
-    const file = reader.readFile(filePath)
-    let data = []
-    const sheets = file.SheetNames
-    for (let i = 0; i < sheets.length; i++) {
-        const temp = reader.utils.sheet_to_json(
-            file.Sheets[file.SheetNames[i]])
-        temp.forEach((res) => {
-            data.push(res)
-        })
-    }
-    return data;
-}
-
 // create new metafields for specific product
 const createMetafields = async (req, res) => {
     const data = readCsv(filePath);
@@ -65,7 +50,7 @@ const createMetafields = async (req, res) => {
     var time = 1000;
     // console.log(data)
     data.map(item => {
-        
+
         let data = {
             metafield: {
                 name: item.name,
@@ -77,30 +62,30 @@ const createMetafields = async (req, res) => {
             }
         }
         setTimeout(() => {
-        axios({
-            url: "https://apna-star-store.myshopify.com/admin/api/2022-10/products/" + item.id + "/metafields.json",
-            method: "post",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Shopify-Access-Token": token,
-                "Accept-Encoding": "gzip,deflate,compress"
-            },
-            data: JSON.stringify(data)
-        }).then(response => {
-            success++;
-            console.log(`count in success ${success}`)
-            logs['dataResponse' + count] = response.data
-        }).catch((err) => {
-            fail++;
-            console.log(`count in failure ${fail}, ${err}`)
-            logs['errorAt' + count] = err.data
-        });
-    }, time * count);
-    count++;
+            axios({
+                url: "https://apna-star-store.myshopify.com/admin/api/2022-10/products/" + item.id + "/metafields.json",
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Shopify-Access-Token": token,
+                    "Accept-Encoding": "gzip,deflate,compress"
+                },
+                data: JSON.stringify(data)
+            }).then(response => {
+                success++;
+                console.log(`count in success ${success}`)
+                logs['dataResponse' + count] = response.data
+            }).catch((err) => {
+                fail++;
+                console.log(`count in failure ${fail}, ${err}`)
+                logs['errorAt' + count] = err.data
+            });
+        }, time * count);
+        count++;
 
     })
     //console.log((logs));
-    res.status(200).json( {message: 'Data Succesfully Imported,'} );
+    res.status(200).json({ message: 'Data Succesfully Imported,' });
 
 };
 
