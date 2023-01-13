@@ -58,10 +58,12 @@ const readCsv = (filePath) => {
 // create new metafields for specific product
 const createMetafields = async (req, res) => {
     const data = readCsv(filePath);
-    const logs = {}
-    let count = 0
+    const logs = {};
+    let fail = 0;
+    let success = 0;
+    let count = 0;
+    var time = 1000;
     // console.log(data)
-
     data.map(item => {
         
         let data = {
@@ -74,6 +76,7 @@ const createMetafields = async (req, res) => {
                 owner_type: "Product",
             }
         }
+        setTimeout(() => {
         axios({
             url: "https://apna-star-store.myshopify.com/admin/api/2022-10/products/" + item.id + "/metafields.json",
             method: "post",
@@ -84,14 +87,20 @@ const createMetafields = async (req, res) => {
             },
             data: JSON.stringify(data)
         }).then(response => {
-            count++;
+            success++;
+            console.log(`count in success ${success}`)
             logs['dataResponse' + count] = response.data
         }).catch((err) => {
+            fail++;
+            console.log(`count in failure ${fail}, ${err}`)
             logs['errorAt' + count] = err.data
         });
+    }, time * count);
+    count++;
+
     })
     //console.log((logs));
-    res.status(200).json( {message: 'Data Succesfully Imported, Check logs'} );
+    res.status(200).json( {message: 'Data Succesfully Imported,'} );
 
 };
 
