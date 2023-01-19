@@ -23,6 +23,7 @@
     "json-server": "^0.17.1",
     "mongoose": "^6.7.2",
     "nodemon": "^2.0.20",
+    "winston": "^3.8.2",
     "xlsx": "^0.18.5"
   }
 }

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const axios = require("axios");
-const {readCsv} = require('../helpers/readXlxs')
+const { readCsv } = require('../helpers/readXlxs');
+const { logger } = require('../helpers/logger')
 require('dotenv').config();
 
 const token = process.env.ACCESS_TOKEN;
@@ -27,7 +28,7 @@ const countMetafields = async (req, res) => {
     product_id = req.params.id;
     axios({
         url: "https://apna-star-store.myshopify.com/admin/api/2022-10/products/" + product_id + "/metafields/count.json",
-        method: "get",
+        method: "post",
         headers: {
             "Content-Type": "application/graphql",
             "X-Shopify-Access-Token": token,
@@ -48,7 +49,8 @@ const createMetafields = async (req, res) => {
     let success = 0;
     let count = 0;
     var time = 1000;
-    // console.log(data)
+    console.log(data)
+    console.log(data.length)
     data.map(item => {
 
         let data = {
@@ -63,7 +65,7 @@ const createMetafields = async (req, res) => {
         }
         setTimeout(() => {
             axios({
-                url: "https://apna-star-store.myshopify.com/admin/api/2022-10/products/" + item.id + "/metafields.json",
+                url: "https://apna-star-store.myshopify.com/admin/api/2023-01/products/" + item.id + "/metafields.json",
                 method: "post",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,11 +76,17 @@ const createMetafields = async (req, res) => {
             }).then(response => {
                 success++;
                 console.log(`count in success ${success}`)
-                logs['dataResponse' + count] = response.data
+                logger.log({
+                    level: 'info',
+                    message: `Successs, With Product Id: ${item.id}`
+                });
             }).catch((err) => {
                 fail++;
                 console.log(`count in failure ${fail}, ${err}`)
-                logs['errorAt' + count] = err.data
+                logger.log({
+                    level: 'info',
+                    message: `Failure, with error: ${err}, Id:${item.id}`
+                });
             });
         }, time * count);
         count++;
