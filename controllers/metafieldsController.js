@@ -43,7 +43,8 @@ const countMetafields = async (req, res) => {
 
 // create new metafields for specific product
 const createMetafields = async (req, res) => {
-    const data = readCsv(filePath);
+    // const data = readCsv(filePath);
+    const data = req.body;
     const logs = {};
     let fail = 0;
     let success = 0;
